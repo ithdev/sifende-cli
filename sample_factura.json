@@ -1,0 +1,34 @@
+{
+  "tipoDocumento": "FACTURA_ELECTRONICA",
+  "tipoEmision": "NORMAL",
+  "tipoTransaccion": "VENTA_MERCADERIA",
+  "fechaEmision": "2026-05-09T10:30:00",
+  "numeroEstablecimiento": 1,
+  "puntoExpedicion": 1,
+  "monedaOperacion": "PYG",
+  "condicionOperacion": "CONTADO",
+  "condicionPago": {
+    "tipo": "CONTADO",
+    "tipoPago": "EFECTIVO",
+    "monedaPago": "PYG",
+    "montoPago": 100000
+  },
+  "receptor": {
+    "tipoContribuyente": "NO_CONTRIBUYENTE",
+    "tipoOperacion": "B2C",
+    "tipoDocumento": "CEDULA_PARAGUAYA",
+    "numeroDocumento": "1234567",
+    "nombreRazonSocial": "JUAN PEREZ"
+  },
+  "items": [
+    {
+      "codigo": "PROD-001",
+      "descripcion": "Servicio de consultoría",
+      "unidadMedida": "UNI",
+      "cantidad": 1,
+      "precioUnitario": 100000,
+      "tasaIVA": 10,
+      "afectacionTributaria": "GRAVADO"
+    }
+  ]
+}
