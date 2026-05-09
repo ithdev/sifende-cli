@@ -1,0 +1,25 @@
+# Environment / secrets
+.env
+
+# Virtual environment
+.venv/
+
+# Generated documents
+documentos/
+
+# Python bytecode / caches
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# PDFs (keep examples/ and tests/ fixtures)
+*.pdf
+!examples/**/*.pdf
+!tests/**/*.pdf
+
+# OS junk
+.DS_Store
+
+# Build artifacts
+dist/
+*.egg-info/
