@@ -31,16 +31,6 @@ python sifende.py emitir --file sample_factura.json
 
 Necesitás una API key de Sifende — [cómo crearla](https://www.sifende.com.py/docs/inicio-rapido/paso-1-credenciales#14-crear-tu-api-key).
 
-La API key se busca en este orden (gana el primero que se encuentre):
-
-1. Flag `--api-key`
-2. Variable de entorno `SIFENDE_API_KEY`
-3. Archivo `.env` en el directorio actual
-4. Archivo `.env` en la raíz del paquete
-
-La key **nunca** se ecoa, ni en logs ni en mensajes de error. El header
-`Authorization` se omite explícitamente al renderizar `HttpError`.
-
 Variables soportadas en `.env`:
 
 | Variable             | Default                                       |
