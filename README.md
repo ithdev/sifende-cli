@@ -3,7 +3,7 @@
 # Sifende CLI
 
 CLI en Python para integrarse con el API de facturación electrónica
-[Sifende](https://api.sifende.com.py) (Paraguay / SIFEN).
+[Sifende](https://www.sifende.com.py) (Paraguay / SIFEN).
 
 Implementa los flujos típicos contra `https://api.sifende.com.py/api/v1/`:
 emitir documentos, consultar estado, descargar el KuDE (PDF), cancelar y
