@@ -7,11 +7,11 @@ import sys
 
 from ..client import SifendeClient
 from ..errors import RejectedError, TimeoutError as PollTimeoutError
-from ..interactive import build_factura_interactive
+from ..interactive import build_documento_interactive
 from ..models import Estado, EmitirResponse
 from ..polling import DEFAULT_TIMEOUT_S, poll_until_terminal
 from ..utils.io import load_json_payload, save_document_folder, save_pdf
-from ..utils.validation import validate_factura_payload
+from ..utils.validation import validate_documento_payload
 
 
 def register(subparsers, *, parents=()) -> None:
@@ -38,12 +38,12 @@ def run(args, client: SifendeClient) -> int:
         payload = load_json_payload(args.file)
     else:
         try:
-            payload = build_factura_interactive()
+            payload = build_documento_interactive()
         except KeyboardInterrupt:
             print("\nemisión cancelada", file=sys.stderr)
             return 130
 
-    validate_factura_payload(payload)
+    validate_documento_payload(payload)
 
     response_payload = client.emitir(payload)
     initial = EmitirResponse.from_api(response_payload)

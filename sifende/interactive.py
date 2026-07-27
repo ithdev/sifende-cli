@@ -8,13 +8,24 @@ from typing import List
 from .errors import ValidationError
 from .utils.formatting import fmt_pyg
 from .utils.io import prompt
-from .utils.validation import validate_pyg
+from .utils.validation import NOTAS, validate_cdc, validate_pyg
 
 
 _TIPO_DOC_CHOICES = {
     "1": "FACTURA_ELECTRONICA",
     "2": "NOTA_DE_CREDITO_ELECTRONICA",
     "3": "NOTA_DE_DEBITO_ELECTRONICA",
+}
+# SIFEN TiMotEmi — keys mirror the enum numeric value.
+_MOTIVO_CHOICES = {
+    "1": "DEVOLUCION_Y_AJUSTES_DE_PRECIOS",
+    "2": "DEVOLUCION",
+    "3": "DESCUENTO",
+    "4": "BONIFICACION",
+    "5": "CREDITO_INCOBRABLE",
+    "6": "RECUPERO_DE_COSTO",
+    "7": "RECUPERO_DE_GASTO",
+    "8": "AJUSTE_DE_PRECIO",
 }
 _MONEDA_CHOICES = {"1": "PYG", "2": "USD", "3": "BRL", "4": "ARS", "5": "EUR"}
 _OP_CHOICES = {"1": "B2C", "2": "B2B", "3": "B2G"}
@@ -69,8 +80,12 @@ def _yesno(value: str) -> str:
     raise ValidationError("respuesta", "responda 's' o 'n'")
 
 
-def build_factura_interactive() -> dict:
-    """Run the interactive wizard. Raises KeyboardInterrupt on Ctrl+C."""
+def build_documento_interactive() -> dict:
+    """Run the interactive wizard. Raises KeyboardInterrupt on Ctrl+C.
+
+    Builds a FACTURA, NOTA_DE_CREDITO or NOTA_DE_DEBITO payload depending on
+    the document type chosen up front.
+    """
     print("=== Sifende — Nuevo Documento Electrónico ===")
 
     tipo_key = prompt(
@@ -155,35 +170,62 @@ def build_factura_interactive() -> dict:
             "afectacionTributaria": afectacion,
         })
 
-    print("\n— Pago —")
-    pago_key = prompt(
-        "Tipo de pago: 1)Efectivo  2)T.Crédito  3)T.Débito  4)Transferencia  5)Cheque  6)Billetera  7)Otro",
-        default="1",
-        validator=lambda s: _choice(s, _TIPO_PAGO_CHOICES, field="tipoPago"),
-    )
     total_general = sum(i["precioUnitario"] * i["cantidad"] for i in items)
-    condicion_pago = {
-        "tipo": "CONTADO",
-        "tipoPago": _TIPO_PAGO_CHOICES[pago_key],
-        "monedaPago": moneda,
-        "montoPago": total_general,
-    }
 
-    print(f"\nResumen: {len(items)} ítem(s) — Total: {fmt_pyg(total_general)} {moneda}")
-    confirm = prompt("Confirmar emisión (s/n)", default="s", validator=_yesno)
-    if confirm != "s":
-        raise KeyboardInterrupt
-
-    return {
+    payload: dict = {
         "tipoDocumento": tipo_doc,
         "tipoEmision": "NORMAL",
-        "tipoTransaccion": "VENTA_MERCADERIA",
         "fechaEmision": fecha,
         "numeroEstablecimiento": establecimiento,
         "puntoExpedicion": punto_exp,
         "monedaOperacion": moneda,
-        "condicionOperacion": "CONTADO",
-        "condicionPago": condicion_pago,
         "receptor": receptor,
         "items": items,
     }
+
+    if tipo_doc in NOTAS:
+        # Nota de crédito / débito: motivo + referencia al DE original.
+        etiqueta = "crédito" if tipo_doc == "NOTA_DE_CREDITO_ELECTRONICA" else "débito"
+        print(f"\n— Nota de {etiqueta} —")
+        motivo_default = "2" if tipo_doc == "NOTA_DE_CREDITO_ELECTRONICA" else "8"
+        motivo_key = prompt(
+            "Motivo de emisión: 1)Devol.+ajuste  2)Devolución  3)Descuento  4)Bonificación  "
+            "5)Crédito incobrable  6)Recupero costo  7)Recupero gasto  8)Ajuste de precio",
+            default=motivo_default,
+            validator=lambda s: _choice(s, _MOTIVO_CHOICES, field="motivoEmision"),
+        )
+        cdc_asociado = prompt(
+            "CDC del documento asociado (factura original, 44 dígitos)",
+            validator=lambda s: validate_cdc(s, field="documentoAsociado.cdc"),
+        )
+        payload["motivoEmision"] = _MOTIVO_CHOICES[motivo_key]
+        payload["documentoAsociado"] = {"tipoDocumento": "ELECTRONICO", "cdc": cdc_asociado}
+        resumen_extra = f" — Motivo: {_MOTIVO_CHOICES[motivo_key]}"
+    else:
+        # Factura: condición de operación + detalle de pago.
+        print("\n— Pago —")
+        pago_key = prompt(
+            "Tipo de pago: 1)Efectivo  2)T.Crédito  3)T.Débito  4)Transferencia  5)Cheque  6)Billetera  7)Otro",
+            default="1",
+            validator=lambda s: _choice(s, _TIPO_PAGO_CHOICES, field="tipoPago"),
+        )
+        payload["tipoTransaccion"] = "VENTA_MERCADERIA"
+        payload["condicionOperacion"] = "CONTADO"
+        payload["condicionPago"] = {
+            "tipo": "CONTADO",
+            "tipoPago": _TIPO_PAGO_CHOICES[pago_key],
+            "monedaPago": moneda,
+            "montoPago": total_general,
+        }
+        resumen_extra = ""
+
+    print(f"\nResumen: {len(items)} ítem(s) — Total: {fmt_pyg(total_general)} {moneda}{resumen_extra}")
+    confirm = prompt("Confirmar emisión (s/n)", default="s", validator=_yesno)
+    if confirm != "s":
+        raise KeyboardInterrupt
+
+    return payload
+
+
+# Backwards-compatible alias — the wizard now covers FE + NC/ND.
+build_factura_interactive = build_documento_interactive
