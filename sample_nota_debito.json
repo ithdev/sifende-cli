@@ -1,0 +1,31 @@
+{
+  "tipoDocumento": "NOTA_DE_DEBITO_ELECTRONICA",
+  "tipoEmision": "NORMAL",
+  "fechaEmision": "2026-05-09T11:30:00",
+  "numeroEstablecimiento": 1,
+  "puntoExpedicion": 1,
+  "monedaOperacion": "PYG",
+  "motivoEmision": "AJUSTE_DE_PRECIO",
+  "documentoAsociado": {
+    "tipoDocumento": "ELECTRONICO",
+    "cdc": "01800000000001001000000012026050912345678901"
+  },
+  "receptor": {
+    "tipoContribuyente": "NO_CONTRIBUYENTE",
+    "tipoOperacion": "B2C",
+    "tipoDocumento": "CEDULA_PARAGUAYA",
+    "numeroDocumento": "1234567",
+    "nombreRazonSocial": "JUAN PEREZ"
+  },
+  "items": [
+    {
+      "codigo": "PROD-001",
+      "descripcion": "Ajuste de precio - Servicio de consultoría",
+      "unidadMedida": "UNI",
+      "cantidad": 1,
+      "precioUnitario": 20000,
+      "tasaIVA": 10,
+      "afectacionTributaria": "GRAVADO"
+    }
+  ]
+}

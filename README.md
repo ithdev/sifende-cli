@@ -45,6 +45,8 @@ Variables soportadas en `.env`:
 |-----------|------|--------|
 | Emitir (archivo) | `make emitir FILE=factura.json` | `python sifende.py emitir --file factura.json` |
 | Emitir (interactivo) | `make emitir-i` | `python sifende.py emitir` |
+| Nota de crédito | `make nota-credito FILE_NC=nc.json` | `python sifende.py emitir --file nc.json` |
+| Nota de débito | `make nota-debito FILE_ND=nd.json` | `python sifende.py emitir --file nd.json` |
 | Consultar estado | `make estado CDC=<cdc>` | `python sifende.py estado <cdc>` |
 | Descargar KuDE | `make kude CDC=<cdc> OUT=factura.pdf` | `python sifende.py kude <cdc> --out factura.pdf` |
 | Cancelar | `make cancelar CDC=<cdc> MOTIVO="..."` | `python sifende.py cancelar <cdc> --motivo "..."` |
@@ -55,6 +57,24 @@ Flags globales disponibles en todos los comandos: `--quiet`, `--json`, `--debug`
 Con Make se pasan como `EXTRA="--json"`.
 
 Al aprobar un documento, la CLI guarda automáticamente `documentos/{cdc}/` con `payload.json`, `response.json` y `kude.pdf`.
+
+### Notas de crédito y débito
+
+Las notas de crédito (`NOTA_DE_CREDITO_ELECTRONICA`) y débito
+(`NOTA_DE_DEBITO_ELECTRONICA`) usan el mismo comando `emitir`. Respecto a una
+factura, requieren dos campos extra y **no** llevan `condicionOperacion`/`condicionPago`:
+
+- `motivoEmision`: uno de `DEVOLUCION`, `DEVOLUCION_Y_AJUSTES_DE_PRECIOS`,
+  `DESCUENTO`, `BONIFICACION`, `CREDITO_INCOBRABLE`, `RECUPERO_DE_COSTO`,
+  `RECUPERO_DE_GASTO`, `AJUSTE_DE_PRECIO`.
+- `documentoAsociado`: la referencia al DE original. Hoy sólo se admite
+  `{"tipoDocumento": "ELECTRONICO", "cdc": "<44 dígitos>"}`, donde el CDC es el
+  de una factura ya aprobada.
+
+Hay ejemplos en `sample_nota_credito.json` y `sample_nota_debito.json` — reemplazá
+el `cdc` del `documentoAsociado` por el de una factura real antes de emitir. El
+modo interactivo (`make emitir-i`) también guía la carga de estos campos cuando
+elegís tipo 2 (nota de crédito) o 3 (nota de débito).
 
 
 ## Estructura del proyecto
@@ -67,6 +87,8 @@ sifende_cli/
 ├── requirements.txt
 ├── .env.example
 ├── sample_factura.json
+├── sample_nota_credito.json
+├── sample_nota_debito.json
 ├── sifende.py
 └── sifende/
     ├── __main__.py

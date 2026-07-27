@@ -11,6 +11,8 @@ SIFENDE  := $(PY) sifende.py
 # Variables por comando (se pueden pisar desde la CLI). Los defaults permiten
 # que `make emitir` funcione directo después de `make setup` con el sample incluido.
 FILE     ?= sample_factura.json
+FILE_NC  ?= sample_nota_credito.json
+FILE_ND  ?= sample_nota_debito.json
 CDC      ?=
 OUT      ?=
 MOTIVO   ?=
@@ -26,8 +28,8 @@ EXTRA    ?=
 
 .DEFAULT_GOAL := help
 
-.PHONY: help setup install env emitir emitir-i estado kude cancelar inutilizar \
-        emit-and-pdf clean
+.PHONY: help setup install env emitir emitir-i nota-credito nota-debito estado \
+        kude cancelar inutilizar emit-and-pdf clean
 
 help: ## Mostrar esta ayuda
 	@echo "Sifende CLI — comandos disponibles:"
@@ -37,6 +39,7 @@ help: ## Mostrar esta ayuda
 	@echo ""
 	@echo "Variables (pisá con VAR=valor):"
 	@echo "  FILE=$(FILE)"
+	@echo "  FILE_NC=$(FILE_NC)  FILE_ND=$(FILE_ND)"
 	@echo "  CDC, OUT, MOTIVO, TIPO, EST, PE, DESDE, HASTA, EXTRA"
 
 # Guard de variable requerida. Los targets listan `guard-FOO` como prerequisito
@@ -68,6 +71,12 @@ emitir: ## Emitir documento (FILE=sample_factura.json por defecto)
 
 emitir-i: ## Emitir en modo interactivo (sin --file)
 	$(SIFENDE) emitir $(EXTRA)
+
+nota-credito: ## Emitir nota de crédito (FILE_NC=sample_nota_credito.json por defecto)
+	$(SIFENDE) emitir --file $(FILE_NC) $(EXTRA)
+
+nota-debito: ## Emitir nota de débito (FILE_ND=sample_nota_debito.json por defecto)
+	$(SIFENDE) emitir --file $(FILE_ND) $(EXTRA)
 
 estado: guard-CDC ## Consultar estado — make estado CDC=xxxx
 	$(SIFENDE) estado $(CDC) $(EXTRA)

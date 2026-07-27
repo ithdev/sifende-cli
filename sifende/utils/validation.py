@@ -11,6 +11,24 @@ from ..errors import ValidationError
 _RUC_RE = re.compile(r"^\d{1,8}-\d$")
 _CDC_RE = re.compile(r"^\d{44}$")
 
+# tipoDocumento discriminators understood by the polymorphic API endpoint.
+FACTURA = "FACTURA_ELECTRONICA"
+NOTA_CREDITO = "NOTA_DE_CREDITO_ELECTRONICA"
+NOTA_DEBITO = "NOTA_DE_DEBITO_ELECTRONICA"
+NOTAS = frozenset({NOTA_CREDITO, NOTA_DEBITO})
+
+# Valid `motivoEmision` values (SIFEN TiMotEmi enum) for NC/ND.
+VALID_MOTIVOS = frozenset({
+    "DEVOLUCION_Y_AJUSTES_DE_PRECIOS",
+    "DEVOLUCION",
+    "DESCUENTO",
+    "BONIFICACION",
+    "CREDITO_INCOBRABLE",
+    "RECUPERO_DE_COSTO",
+    "RECUPERO_DE_GASTO",
+    "AJUSTE_DE_PRECIO",
+})
+
 
 def validate_ruc(value: str, *, field: str = "ruc") -> str:
     if not isinstance(value, str) or not _RUC_RE.match(value):
@@ -50,9 +68,30 @@ def validate_motivo(value: str, *, field: str = "motivo", min_len: int = 5) -> s
     return value.strip()
 
 
-def validate_factura_payload(payload: dict) -> dict:
+def validate_documento_asociado(asoc, *, field: str = "documentoAsociado") -> dict:
+    """Validate the reference to the original DE that a NC/ND modifies.
+
+    Mirrors the backend `DocumentoAsociadoValidator`: only ELECTRONICO is
+    accepted, and it must carry a 44-digit CDC.
+    """
+    if not isinstance(asoc, dict):
+        raise ValidationError(field, "se esperaba un objeto")
+    tipo = asoc.get("tipoDocumento")
+    if tipo != "ELECTRONICO":
+        raise ValidationError(
+            f"{field}.tipoDocumento",
+            "solo se admite documento asociado ELECTRONICO",
+        )
+    validate_cdc(asoc.get("cdc") or "", field=f"{field}.cdc")
+    return asoc
+
+
+def validate_documento_payload(payload: dict) -> dict:
     """Defense-in-depth check before posting. SIFEN is the source of truth;
     this only catches obvious shape errors that would make the call wasted.
+
+    Branches on `tipoDocumento`: FACTURA_ELECTRONICA requires
+    `condicionOperacion`; NC/ND require `motivoEmision` + `documentoAsociado`.
     """
     if not isinstance(payload, dict):
         raise ValidationError("payload", "se esperaba un objeto JSON")
@@ -65,7 +104,6 @@ def validate_factura_payload(payload: dict) -> dict:
         "puntoExpedicion",
         "monedaOperacion",
         "receptor",
-        "condicionOperacion",
         "items",
     )
     missing = [k for k in required if k not in payload]
@@ -73,6 +111,22 @@ def validate_factura_payload(payload: dict) -> dict:
         raise ValidationError("payload", f"campos requeridos ausentes: {', '.join(missing)}")
 
     validate_iso_no_tz(payload["fechaEmision"], field="fechaEmision")
+
+    tipo_doc = payload["tipoDocumento"]
+    if tipo_doc == FACTURA:
+        if "condicionOperacion" not in payload:
+            raise ValidationError("condicionOperacion", "campo requerido para factura")
+    elif tipo_doc in NOTAS:
+        motivo = payload.get("motivoEmision")
+        if motivo is None:
+            raise ValidationError("motivoEmision", "campo requerido para notas de crédito/débito")
+        if motivo not in VALID_MOTIVOS:
+            raise ValidationError("motivoEmision", f"motivo inválido: {motivo!r}")
+        if "documentoAsociado" not in payload:
+            raise ValidationError(
+                "documentoAsociado", "campo requerido para notas de crédito/débito"
+            )
+        validate_documento_asociado(payload["documentoAsociado"])
 
     items = payload["items"]
     if not isinstance(items, list) or not items:
@@ -93,3 +147,7 @@ def validate_factura_payload(payload: dict) -> dict:
             raise ValidationError(f"receptor.{k}", "campo requerido")
 
     return payload
+
+
+# Backwards-compatible alias — the validator now covers FE + NC/ND.
+validate_factura_payload = validate_documento_payload
