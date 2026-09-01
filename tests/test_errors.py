@@ -40,3 +40,9 @@ def test_rejected_error_stores_cdc_estado_mensaje():
     assert err.estado == "RECHAZADO"
     assert err.mensaje_rechazo == "factura rechazada por SIFEN"
     assert "RECHAZADO" in str(err)
+
+
+def test_rejected_event_error_does_not_render_empty_cdc():
+    err = RejectedError(None, "RECHAZADO", "evento rechazado")
+    assert "CDC" not in str(err)
+    assert str(err) == "RECHAZADO: evento rechazado"

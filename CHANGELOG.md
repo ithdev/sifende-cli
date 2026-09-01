@@ -18,6 +18,9 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Changed
 
+- `inutilizar` ahora acepta el rango real de SIFEN (2 a 1000 números), rechaza
+  localmente rangos unitarios y devuelve exit code `2` cuando el evento queda
+  `RECHAZADO` o no retorna el código de aprobación `0600`.
 - La validación local ahora depende del `tipoDocumento`: la factura sigue
   requiriendo `condicionOperacion`; las NC/ND requieren `motivoEmision` (valor
   válido del enum SIFEN) y un `documentoAsociado` `ELECTRONICO` con CDC de 44

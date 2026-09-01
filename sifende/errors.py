@@ -74,15 +74,17 @@ class NotFoundError(HttpError):
 class RejectedError(SifendeError):
     """SIFEN returned a terminal RECHAZADO or ERROR state.
 
-    `cdc` is always preserved so the user can re-check via `estado <CDC>`.
+    `cdc` is preserved for document operations. Event operations such as
+    inutilizacion do not have a CDC, so they pass ``None``.
     `mensaje_rechazo` is verbatim from SIFEN and printed unchanged.
     """
 
-    def __init__(self, cdc: str, estado: str, mensaje_rechazo: Optional[str]) -> None:
+    def __init__(self, cdc: Optional[str], estado: str, mensaje_rechazo: Optional[str]) -> None:
         self.cdc = cdc
         self.estado = estado
         self.mensaje_rechazo = mensaje_rechazo or ""
-        super().__init__(f"{estado} (CDC={cdc}): {self.mensaje_rechazo or '<sin mensaje>'}")
+        reference = f" (CDC={cdc})" if cdc else ""
+        super().__init__(f"{estado}{reference}: {self.mensaje_rechazo or '<sin mensaje>'}")
 
 
 class TimeoutError(SifendeError):  # noqa: A001 — intentional shadow, scoped to this module's namespace
