@@ -56,6 +56,10 @@ Variables soportadas en `.env`:
 Flags globales disponibles en todos los comandos: `--quiet`, `--json`, `--debug`, `--api-key`, `--base-url`.
 Con Make se pasan como `EXTRA="--json"`.
 
+La inutilización admite rangos de 2 a 1000 números por evento, conforme a las
+restricciones de SIFEN. Una respuesta HTTP exitosa cuyo evento termine en
+`RECHAZADO` o con un código distinto de `0600` devuelve exit code `2`.
+
 Al aprobar un documento, la CLI guarda automáticamente `documentos/{cdc}/` con `payload.json`, `response.json` y `kude.pdf`.
 
 ### Notas de crédito y débito
