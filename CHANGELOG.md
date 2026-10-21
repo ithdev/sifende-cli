@@ -8,6 +8,10 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- `kude --formato {a4,ticket,ticket-resumen}` y `--ancho {80,58}` para descargar
+  el KuDE en cinta de papel de impresoras térmicas. Sin `--out`, el ticket se
+  guarda como `<CDC>-ticket.pdf` o `<CDC>-ticket-resumen.pdf`. `make kude` acepta
+  `FORMATO` y `ANCHO`.
 - Emisión de **notas de crédito** (`NOTA_DE_CREDITO_ELECTRONICA`) y **notas de
   débito** (`NOTA_DE_DEBITO_ELECTRONICA`) vía el comando `emitir`, tanto por
   archivo como en modo interactivo. El wizard pide `motivoEmision` y el CDC del

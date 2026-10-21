@@ -134,6 +134,14 @@ class SifendeClient:
         resp = self._request("GET", f"documento-electronico/{cdc}/kude", accept="application/pdf")
         return resp.content
 
+    def kude_ticket(self, cdc: str, *, ancho: int = 80, resumen: bool = False) -> bytes:
+        resp = self._request(
+            "GET",
+            f"documento-electronico/{cdc}/kude/ticket?ancho={ancho}&resumen={'true' if resumen else 'false'}",
+            accept="application/pdf",
+        )
+        return resp.content
+
     def cancelar(self, cdc: str, motivo: str) -> dict:
         resp = self._request(
             "POST",
