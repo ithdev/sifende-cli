@@ -81,8 +81,8 @@ nota-debito: ## Emitir nota de débito (FILE_ND=sample_nota_debito.json por defe
 estado: guard-CDC ## Consultar estado — make estado CDC=xxxx
 	$(SIFENDE) estado $(CDC) $(EXTRA)
 
-kude: guard-CDC ## Descargar KuDE PDF — make kude CDC=xxxx [OUT=ruta.pdf]
-	$(SIFENDE) kude $(CDC) $(if $(OUT),--out $(OUT)) $(EXTRA)
+kude: guard-CDC ## Descargar KuDE PDF — make kude CDC=xxxx [FORMATO=ticket ANCHO=58] [OUT=ruta.pdf]
+	$(SIFENDE) kude $(CDC) $(if $(FORMATO),--formato $(FORMATO)) $(if $(ANCHO),--ancho $(ANCHO)) $(if $(OUT),--out $(OUT)) $(EXTRA)
 
 cancelar: guard-CDC guard-MOTIVO ## Cancelar documento — make cancelar CDC=xxxx MOTIVO="..."
 	$(SIFENDE) cancelar $(CDC) --motivo "$(MOTIVO)" $(EXTRA)

@@ -49,6 +49,7 @@ Variables soportadas en `.env`:
 | Nota de débito | `make nota-debito FILE_ND=nd.json` | `python sifende.py emitir --file nd.json` |
 | Consultar estado | `make estado CDC=<cdc>` | `python sifende.py estado <cdc>` |
 | Descargar KuDE | `make kude CDC=<cdc> OUT=factura.pdf` | `python sifende.py kude <cdc> --out factura.pdf` |
+| KuDE en ticket | `make kude CDC=<cdc> FORMATO=ticket ANCHO=58` | `python sifende.py kude <cdc> --formato ticket --ancho 58` |
 | Cancelar | `make cancelar CDC=<cdc> MOTIVO="..."` | `python sifende.py cancelar <cdc> --motivo "..."` |
 | Inutilizar | `make inutilizar TIPO=1 EST=001 PE=001 TIMBRADO=<t> DESDE=1 HASTA=3 MOTIVO="..."` | `python sifende.py inutilizar --tipo-documento 1 --establecimiento 001 --punto-expedicion 001 --numero-timbrado <t> --desde 1 --hasta 3 --motivo "..."` |
 | Debug HTTP | `make debug FILE=factura.json` | `python sifende.py --debug emitir --file factura.json` |
@@ -61,6 +62,14 @@ restricciones de SIFEN. Una respuesta HTTP exitosa cuyo evento termine en
 `RECHAZADO` o con un código distinto de `0600` devuelve exit code `2`.
 
 Al aprobar un documento, la CLI guarda automáticamente `documentos/{cdc}/` con `payload.json`, `response.json` y `kude.pdf`.
+
+### KuDE en cinta de papel
+
+`kude --formato ticket` descarga el KuDE en cinta de papel para impresoras
+térmicas, con `--ancho 80` (default) o `--ancho 58`. `--formato ticket-resumen`
+omite el detalle de ítems e impuestos, para cuando el cliente pide el resumen. Sólo
+está disponible para facturas y notas de crédito o débito; el KuDE A4 sigue siendo
+el que se guarda y se envía por email.
 
 ### Notas de crédito y débito
 
