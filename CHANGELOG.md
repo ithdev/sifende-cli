@@ -18,6 +18,9 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Changed
 
+- La licencia pasa de MIT a Apache-2.0, con el copyright de ITH E.A.S. y un archivo
+  `NOTICE`, como el resto de los repos públicos de Sifende. Las versiones ya
+  publicadas siguen bajo MIT.
 - `inutilizar` ahora acepta el rango real de SIFEN (2 a 1000 números), rechaza
   localmente rangos unitarios y devuelve exit code `2` cuando el evento queda
   `RECHAZADO` o no retorna el código de aprobación `0600`.
