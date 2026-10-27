@@ -3,7 +3,7 @@
 # Sifende CLI
 
 ![CI](https://github.com/ithdev/sifende-cli/actions/workflows/ci.yml/badge.svg)
-![Licencia: MIT](https://img.shields.io/badge/licencia-MIT-blue)
+![Licencia: Apache 2.0](https://img.shields.io/badge/licencia-Apache%202.0-blue)
 
 CLI en Python para probar la API de [Sifende](https://www.sifende.com.py) desde la terminal: emitir facturas y notas,
 consultar su estado, descargar el KuDE, cancelar e inutilizar numeración en SIFEN.
@@ -115,4 +115,4 @@ La CI corre los tests con Python 3.11 y 3.12. Los cambios se anotan en el [CHANG
 
 ## Licencia
 
-[MIT](LICENSE).
+[Apache 2.0](LICENSE). Copyright 2026 ITH E.A.S.; ver [NOTICE](NOTICE).
